@@ -41,19 +41,86 @@ declare( strict_types=1 );
 namespace MediaWiki\Extension\ZabezpieczStrone;
 
 use MediaWiki\Hook\ParserFirstCallInitHook;
+use MediaWiki\Hook\AlternateEditHook;
 use Parser;
+use Title;
+use OutputPage;
 
-class Hooks implements ParserFirstCallInitHook {
+class Hooks implements ParserFirstCallInitHook, AlternateEditHook {
+	  // Register any render callbacks with the parser
 
 //	define("PROTECT_TAG", "zabezp");
 //        define("PARAM_ALLOW", "pozw");
 //	define("PARAM_DENY", "zabr");
 
 
-	// Register any render callbacks with the parser
-	public  function onParserFirstCallInit( $parser ) : void {
-		// When the parser sees the <sample> tag, it executes renderTagSample (see below)
+	/**
+	 * ParserFirstCallInit hook handler
+	 * @see https://www.mediawiki.org/wiki/Manual:Hooks/ParserFirstCallInit
+	 * @param Parser $parser
+	 */
+	public function onParserFirstCallInit( $parser ) : void {
+		// When the parser sees the <zabezp> tag, it executes ZabezpieczStrone::parserHook
 		$parser->setHook( 'zabezp', ZabezpieczStrone::class . '::parserHook');
 	}
+
+	private function blockEdits($u_yes, $u_no, $user, $editPage) {
+		wfDebugLog( 'mzab', "blockEdits" );
+		wfDebugLog( 'mzab', $user );
+		// Forbidden users are forbidden even if allowed
+		if (in_array($user, $u_no)) {
+			wfDebugLog( 'mzab', "Forbidden " . $user );
+			$context = $editPage->getContext();
+			$output = $context->getOutput();
+			// TODO: allow for the owner
+			$output->setPageTitle( "Strona zabezpieczona przez uÅytkownika"  );
+			$output->addWikiTextAsContent( "'''[[Pomoc:Strona zabezpieczona|Strona zabezpieczona]] .'''" );
+    			#$wgOut->addWikiText( pokazKomunikat($u_tak, $u_nie) );
+			return false;
+		}
+		// Allowed are only users that are explicite made allowed
+		if (!empty($u_yes) && in_array($user, $u_yes)) {
+			return true;
+		}
+		// All other users are forbidden
+		return false;
+	}
+
+	/**
+	 * AlternateEdit hook handler
+	 * @see https://www.mediawiki.org/wiki/Manual:Hooks/AlternateEdit
+	 * @param EditPage $editpage
+	 */
+	public function onAlternateEdit( $editPage ) {
+		$context = $editPage->getContext();
+		$user = $context->getUser();
+		$title = $editPage->getTitle();
+		$ns = $title->getNamespace();
+		$content = $editPage->getArticle()->getPage()->getContent();
+
+    	        $tags = array();
+                Parser::extractTagsAndParams(['zabezp'], $content->getText(), $tags );
+
+		if ( ($ns == NS_USER || $ns == NS_USER_TALK) && !empty($tags) ) {
+			$u_yes = array();
+			$u_no = array();
+			foreach ($tags as $elem) {
+				$params = $elem[2];
+				foreach ($params as $key => $val) {
+					if ($key == "pozw") {
+						array_push($u_yes, $val);
+					};
+					if ($key == "zabr") {
+						array_push($u_no, $val);
+					}
+				}
+			};
+			return $this->blockEdits($u_yes, $u_no, $user, $editPage);
+		};
+
+		return true;
+	}
+
+
 
 };

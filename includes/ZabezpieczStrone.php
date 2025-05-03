@@ -48,7 +48,7 @@ use Sanitizer;
 
 class ZabezpieczStrone {
 
-//	define("PROTECT_TAG", "zabezp");
+	const PROTECT_TAG = "zabezp";
 //        define("PARAM_ALLOW", "pozw");
 //	define("PARAM_DENY", "zabr");
 
@@ -65,9 +65,8 @@ class ZabezpieczStrone {
 		// Sanitize to attributes that would be valid on a <div>
 		$attrs = Sanitizer::safeEncodeTagAttributes( Sanitizer::validateTagAttributes( $args, 'div' ) );
 
-		$result .= '<div class="zabezp" ' . $attrs . '>';
+		$result .= '<div class="' . $PROTECT_TAG . '" ' . $attrs . '>';
 
-		wfDebugLog( 'zabezp', $input );
 		$result .= $parser->recursiveTagParse( $input, $frame );
 		$result .= '</div>';
 		return $result;

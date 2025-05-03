@@ -18,7 +18,9 @@
 		"MediaWiki\\Extension\\ZabezpieczStrone\\": "includes/"
 	},
 	"Hooks": {
-                "ParserFirstCallInit": "ZabezpieczStroneHooks"
+                "ParserFirstCallInit": "ZabezpieczStroneHooks",
+		"AlternateEdit": "ZabezpieczStroneHooks"
+
         },
 	"HookHandlers": {
 		"ZabezpieczStroneHooks": {
