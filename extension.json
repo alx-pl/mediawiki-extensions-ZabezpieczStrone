@@ -1,19 +1,24 @@
 {
 	"name": "ZabezpieczStrone",
-	"namemsg": "zabezpieczstrone-extensionname",
 	"version": "0.3.0",
 	"author": [
 		"Miłosz Biedrzycki", "Alx z PoeWiki"
 	],
 	"url": "https://github.com/alx-pl/mediawiki-extensions-ZabezpieczStrone/",
-	"descriptionmsg": "zabezpieczstrone-desc",
+	"descriptionmsg": "zabezp-desc",
 	"type": "parserhook",
 	"license-name": "GPL-3.0-or-later",
+	"requires": {
+		"MediaWiki": ">= 1.35.0"
+	},
 	"MessagesDirs": {
 		"ZabezpieczStrone": [
-			"i18n"
+			"/i18n"
 		]
 	},
+	"TrackingCategories": [
+		"zabezp-category"
+	],
 	"AutoloadNamespaces": {
 		"MediaWiki\\Extension\\ZabezpieczStrone\\": "includes/"
 	},

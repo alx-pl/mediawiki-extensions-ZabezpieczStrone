@@ -1,0 +1,12 @@
+{
+	"@metadata": {
+		"authors": [
+			"Alx z Poewiki",
+			"Miłosz Biedrzycki"
+		]
+	},
+	"zabezp-desc": "Privately set access rights mechanism specific for PoeWiki.",
+	"zabezp-category": "Pages using zabezp parser tag",
+	"zabezp-warning-page-title" : "Page is protected by the user",
+        "zabezp-warning-page-content" : "For more information see [[Help:{{int:protectedpage}}]]"
+}

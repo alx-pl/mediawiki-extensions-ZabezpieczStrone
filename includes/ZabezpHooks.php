@@ -8,8 +8,8 @@
  * @category  Extension
  * @package   ZabezpieczStrone
  * @author    Alx z Poewiki
- * @author    Miłosz Biedrzycki
- * @copyright Miłosz Biedrzycki, Alx z Poewiki
+ * @author    MiﾅＰsz Biedrzycki
+ * @copyright MiﾅＰsz Biedrzycki, Alx z Poewiki
  * @license   GPL-3.0-or-later
  * @version   GIT: 0.3
  * @link      ??
@@ -97,28 +97,39 @@ class ZabezpHooks implements ParserFirstCallInitHook, AlternateEditHook {
 	 * @param $editPage - page that is under edit, may be changed
 	 */
 	private function blockEdits($u_yes, $u_no, $user, $editPage) {
-		wfDebugLog( 'mzab', "blockEdits" );
 		// The owner of the namespace is always allowed to edit
 		$usertitle = $editPage->getTitle()->getBaseText();
 		if ($user == $usertitle) return true;
 		//return true;
 		// Forbidden users are forbidden even if allowed
 		if (in_array($user, $u_no)) {
-			wfDebugLog( 'mzab', "Forbidden " . $user );
-			$context = $editPage->getContext();
-			$output = $context->getOutput();
-			$output->setPageTitle( "Strona zabezpieczona przez u�ytkownika"  );
-			$output->addWikiTextAsContent( "'''[[Pomoc:Strona zabezpieczona|Strona zabezpieczona]] .'''" );
-    			#$wgOut->addWikiText( pokazKomunikat($u_tak, $u_nie) );
+			$this->showMessage($editPage, $user);
 			return false;
 		}
 		// Allowed are only users that are explicite made allowed
 		if (!empty($u_yes) && in_array($user, $u_yes)) {
-			wfDebugLog( 'mzab', "Allowed " . $user );
 			return true;
 		}
 		// All other users are forbidden
+		$this->showMessage($editPage, $user);
 		return false;
+	}
+
+	/**
+	 * Display the warning that the page is protected.
+	 * Note that the user is the first argument of the text
+	 * @param $editPage - page for which the message is generated
+	 * @param $user - the user for which the message is generated
+	 */
+	public function showMessage($editPage, $user) {
+		$context = $editPage->getContext();
+		$output = $context->getOutput();
+		$methods = get_class_methods($context);
+		$context->getWikiPage()->doPurge();
+		$ptitletext = wfMessage( 'zabezp-warning-page-title', $user )->parse();
+		$output->setPageTitle( $ptitletext );
+		$pconttext = wfMessage( 'zabezp-warning-page-content', $user )->parse();
+		$output->addHTML( $pconttext  );
 	}
 
 	/**

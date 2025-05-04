@@ -1,0 +1,12 @@
+{
+	"@metadata": {
+		"authors": [
+			"Alx z Poewiki",
+			"Miłosz Biedrzycki"
+		]
+	},
+	"zabezp-desc": "Mechanizm prywatnego okreslania praw dostepu do stron specjalnie wprowadzony na potrzeby PoeWiki.",
+	"zabezp-category": "Strony uzywajace tagu zabez",
+	"zabezp-warning-page-title" : "Strona zablokowana przez uzytkownika",
+        "zabezp-warning-page-content" : "Wiecej informacji, $1, znajdziesz na stronie [[Pomoc:{{int:protectedpage}}]]."
+}
