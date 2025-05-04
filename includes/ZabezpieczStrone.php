@@ -43,14 +43,10 @@ namespace MediaWiki\Extension\ZabezpieczStrone;
 use MediaWiki\Hook\ParserFirstCallInitHook;
 use PPFrame;
 use Parser;
-/* TODO: Switch to MediaWiki\\Parser\\Sanitizer when Sanitizer fallback is fully dropped */
 use Sanitizer;
+use MediaWiki\Extension\ZabezpieczStrone\ZabezpHooks;
 
 class ZabezpieczStrone {
-
-	const PROTECT_TAG = "zabezp";
-//        define("PARAM_ALLOW", "pozw");
-//	define("PARAM_DENY", "zabr");
 
 
 	// Register any render callbacks with the parser
@@ -65,7 +61,7 @@ class ZabezpieczStrone {
 		// Sanitize to attributes that would be valid on a <div>
 		$attrs = Sanitizer::safeEncodeTagAttributes( Sanitizer::validateTagAttributes( $args, 'div' ) );
 
-		$result .= '<div class="' . $PROTECT_TAG . '" ' . $attrs . '>';
+		$result .= '<div class="' . ZabezpHooks::PROTECT_TAG . '" ' . $attrs . '>';
 
 		$result .= $parser->recursiveTagParse( $input, $frame );
 		$result .= '</div>';

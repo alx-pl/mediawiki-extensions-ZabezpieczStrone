@@ -24,7 +24,7 @@
         },
 	"HookHandlers": {
 		"ZabezpieczStroneHooks": {
-			"class": "MediaWiki\\Extension\\ZabezpieczStrone\\Hooks"
+			"class": "MediaWiki\\Extension\\ZabezpieczStrone\\ZabezpHooks"
 		}
 	},
         "config": {
