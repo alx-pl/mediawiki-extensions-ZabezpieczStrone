@@ -8,8 +8,8 @@
  * @category  Extension
  * @package   ZabezpieczStrone
  * @author    Alx z Poewiki
- * @author    Miłosz Biedrzycki
- * @copyright Miłosz Biedrzycki, Alx z Poewiki
+ * @author    MiﾅＰsz Biedrzycki
+ * @copyright MiﾅＰsz Biedrzycki, Alx z Poewiki
  * @license   GPL-3.0-or-later
  * @version   GIT: 0.3
  * @link      ??
@@ -73,7 +73,7 @@ class Hooks implements ParserFirstCallInitHook, AlternateEditHook {
 			$context = $editPage->getContext();
 			$output = $context->getOutput();
 			// TODO: allow for the owner
-			$output->setPageTitle( "Strona zabezpieczona przez u�ytkownika"  );
+			$output->setPageTitle( "Strona zabezpieczona przez użytkownika"  );
 			$output->addWikiTextAsContent( "'''[[Pomoc:Strona zabezpieczona|Strona zabezpieczona]] .'''" );
     			#$wgOut->addWikiText( pokazKomunikat($u_tak, $u_nie) );
 			return false;
