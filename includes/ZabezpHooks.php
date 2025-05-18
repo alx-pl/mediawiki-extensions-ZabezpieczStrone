@@ -42,11 +42,17 @@ namespace MediaWiki\Extension\ZabezpieczStrone;
 
 use MediaWiki\Hook\ParserFirstCallInitHook;
 use MediaWiki\Hook\AlternateEditHook;
+use MediaWiki\Permissions\Hook\GetUserPermissionsErrorsExpensiveHook;
+use RequestContext;
 use Parser;
 use Title;
 use OutputPage;
 
-class ZabezpHooks implements ParserFirstCallInitHook, AlternateEditHook {
+class ZabezpHooks 
+	implements 
+		ParserFirstCallInitHook, 
+		AlternateEditHook,
+		GetUserPermissionsErrorsExpensiveHook {
 	// Register any render callbacks with the parser
 	
 	const PROTECT_TAG = 'zabezp';
@@ -76,8 +82,12 @@ class ZabezpHooks implements ParserFirstCallInitHook, AlternateEditHook {
 		$ns = $title->getNamespace();
 		$content = $editPage->getArticle()->getPage()->getContent();
 
-    	        $tags = array();
-                Parser::extractTagsAndParams([ZabezpHooks::PROTECT_TAG], $content->getText(), $tags );
+		$tags = array();
+		if ($content != null) {
+                	Parser::extractTagsAndParams([ZabezpHooks::PROTECT_TAG], $content->getText(), $tags );
+		} else {
+			$tags = [];
+		}
 
 		if ( ($ns == NS_USER || $ns == NS_USER_TALK) && !empty($tags) ) {
 			$u_yes = array();
@@ -152,4 +162,63 @@ class ZabezpHooks implements ParserFirstCallInitHook, AlternateEditHook {
 		};
 	}
 
+	/**
+	 * Hook to manage the new permission system with 'editall'.
+	 * 
+	 * @param Title  $title  Title being checked against
+	 * @param User   $user   Current user
+	 * @param string $action Action being checked
+	 * @param array | string | MessageSpecifier &$result User
+         *        permissions error to add. If none, return true. For
+         *        consistency, error messages should be plain text with no
+         *        special coloring, bolding, etc. to show that they're
+         *        errors; presenting them properly to the user as errors is
+         *        done by the caller.
+	 
+	 * @param $tags - array with parameters of zabezp tag
+	 * @param $u_tak - storage for user names that are allowed to edit
+	 * @param $u_no - storage for user names that are forbidden to edit
+	 */
+	public function onGetUserPermissionsErrorsExpensive(
+	       		$title,
+			$user,
+			$action,
+			& $result ) {
+		    // Fragment prepared with help of ChatGPT
+		    // Allow users with the editall right (e.g., sysops)
+    		    if ( $user->isAllowed( 'editall' ) ) {
+        	       return true;
+    		    }
+
+		    // Allow here read and view actions unconditionally
+    		    $action = RequestContext::getMain()->getRequest()->getVal( 'action', 'view' );
+    		    if ( in_array( $action, [ 'read', 'view', 'history', 'render' ] ) ) {
+        	       return true;
+    		    }
+
+    		    // Only edit-like actions are affected
+    		    if ( !in_array( $action, [ 'edit', 'submit' ] ) ) {
+        	       return true;
+    		    }
+
+		    $namespace = $title->getNamespace();
+		    // Allow edits in user talk pages for all users
+		    if ( $user->isAllowed( 'edit' ) && $namespace === NS_USER_TALK ) {
+		       return true;
+		    }
+
+    		    // Only allow editing if it's the user's own user or user talk page
+    		    $namespace = $title->getNamespace();
+		    if ( $namespace === NS_USER ) {
+        	       $pageOwner = explode( '/', $title->getText() )[0];
+        	       if ( $pageOwner === $user->getName() ) {
+            	       	  return true;
+        	       }
+    		    }
+
+    		    // Block edits otherwise
+		    $result = [ 'badaccess-group0' ];
+    		    return false;
+
+	}
 };
